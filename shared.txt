@@ -1,0 +1,231 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Search, Menu, MapPin, ChevronRight, Star, 
+  Zap, Shield, Clock, Car, Phone, X 
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const ToyotaWebsite = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [zipCode, setZipCode] = useState('');
+
+  // Handle Navbar scroll effect
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-white font-sans text-slate-900">
+      
+      {/* 1. GLOBAL NAVIGATION */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4 text-white'}`}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <div className="text-2xl font-bold tracking-tighter flex items-center italic">
+              <span className={isScrolled ? 'text-red-600' : 'text-white'}>TOYOTA</span>
+            </div>
+            <div className="hidden lg:flex gap-6 font-medium text-sm uppercase tracking-widest">
+              <a href="#" className="hover:text-red-500 transition">Models</a>
+              <a href="#" className="hover:text-red-500 transition">Why Toyota</a>
+              <a href="#" className="hover:text-red-500 transition">Dealers</a>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Search className="w-5 h-5 cursor-pointer" />
+            <button className="bg-[#EB0A1E] text-white px-6 py-2 rounded-sm font-bold uppercase text-xs tracking-widest hover:bg-black transition">
+              Build & Price
+            </button>
+            <Menu className="lg:hidden w-6 h-6" />
+          </div>
+        </div>
+      </nav>
+
+      {/* 2. HERO SECTION */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+        <div className="absolute inset-0 opacity-60">
+          <img 
+            src="https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?auto=format&fit=crop&q=80&w=2000" 
+            alt="Toyota SUV on mountain" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="relative z-10 text-center text-white px-4">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-7xl font-bold mb-6 tracking-tight"
+          >
+            Built for wherever life takes you.
+          </motion.h1>
+          <p className="text-xl md:text-2xl mb-8 font-light max-w-2xl mx-auto">
+            Explore the new 2024 lineup of hybrids, trucks, and SUVs.
+          </p>
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <button className="bg-[#EB0A1E] text-white px-10 py-4 rounded-sm font-bold uppercase tracking-widest hover:scale-105 transition-transform">
+              Build & Price
+            </button>
+            <button className="border-2 border-white text-white px-10 py-4 rounded-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black transition">
+              View All Models
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. CORE CONTENT ROW (4 Panels) */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="group bg-slate-50 p-8 border-b-4 border-transparent hover:border-red-600 transition shadow-sm">
+            <Car className="w-10 h-10 mb-6 text-red-600" />
+            <h3 className="text-xl font-bold mb-2">Featured Models</h3>
+            <p className="text-slate-600 text-sm mb-6">Find the perfect match for your lifestyle.</p>
+            <a href="#" className="font-bold text-xs uppercase tracking-widest flex items-center">Explore RAV4 <ChevronRight className="w-4 h-4 ml-1" /></a>
+          </div>
+          <div className="group bg-slate-50 p-8 border-b-4 border-transparent hover:border-red-600 transition shadow-sm">
+            <Shield className="w-10 h-10 mb-6 text-red-600" />
+            <h3 className="text-xl font-bold mb-2">Why Toyota</h3>
+            <p className="text-slate-600 text-sm mb-6">Safety and reliability are in our DNA.</p>
+            <a href="#" className="font-bold text-xs uppercase tracking-widest flex items-center">See Reliability Data <ChevronRight className="w-4 h-4 ml-1" /></a>
+          </div>
+          <div className="group bg-slate-50 p-8 border-b-4 border-transparent hover:border-red-600 transition shadow-sm">
+            <Clock className="w-10 h-10 mb-6 text-red-600" />
+            <h3 className="text-xl font-bold mb-2">Offers & Finance</h3>
+            <p className="text-slate-600 text-sm mb-6">Explore 1.9% APR on select 2024 models.</p>
+            <a href="#" className="font-bold text-xs uppercase tracking-widest flex items-center">Today's Offers <ChevronRight className="w-4 h-4 ml-1" /></a>
+          </div>
+          <div className="group bg-slate-50 p-8 border-b-4 border-transparent hover:border-red-600 transition shadow-sm">
+            <Zap className="w-10 h-10 mb-6 text-red-600" />
+            <h3 className="text-xl font-bold mb-2">Go Electric</h3>
+            <p className="text-slate-600 text-sm mb-6">Hybrid, Plug-in, or Battery Electric.</p>
+            <a href="#" className="font-bold text-xs uppercase tracking-widest flex items-center">Compare Electrified <ChevronRight className="w-4 h-4 ml-1" /></a>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. BUILD & PRICE CTA BAND */}
+      <section className="bg-[#EB0A1E] py-12 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="text-white">
+            <h2 className="text-3xl font-bold mb-2">Ready to find yours?</h2>
+            <p className="opacity-90">Select a model to see inventory in your area.</p>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 w-full lg:w-auto">
+            <select className="px-6 py-4 rounded-sm bg-white text-slate-900 font-bold min-w-[200px]">
+              <option>Select Model</option>
+              <option>RAV4</option>
+              <option>Camry</option>
+              <option>Tacoma</option>
+            </select>
+            <input 
+              type="text" 
+              placeholder="Zip Code" 
+              className="px-6 py-4 rounded-sm bg-white text-slate-900"
+              onChange={(e) => setZipCode(e.target.value)}
+            />
+            <button className="bg-black text-white px-10 py-4 rounded-sm font-bold uppercase tracking-widest hover:bg-slate-800 transition">
+              Find My Toyota
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. SOCIAL PROOF STRIP */}
+      <section className="bg-slate-100 py-10">
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-8 opacity-60 grayscale hover:grayscale-0 transition duration-500">
+          <div className="flex items-center gap-2"><Star className="fill-current" /> <span className="font-bold">J.D. POWER #1</span></div>
+          <div className="font-black text-xl italic">IIHS TOP SAFETY PICK</div>
+          <div className="flex items-center gap-2 font-bold text-lg italic tracking-tighter">Euro NCAP ★★★★★</div>
+          <div className="font-bold italic">KELLEY BLUE BOOK BEST RESALE VALUE</div>
+        </div>
+      </section>
+
+      {/* 6. DEALER FINDER & TEST DRIVE */}
+      <section className="py-20 px-6 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div>
+          <h2 className="text-4xl font-bold mb-6">Experience it in person.</h2>
+          <p className="text-slate-600 mb-8">Choose your preferred dealer and schedule a test drive at your convenience.</p>
+          <div className="bg-slate-200 h-80 rounded-lg flex items-center justify-center text-slate-400 italic">
+            [Interactive Map API Component]
+          </div>
+        </div>
+        <div className="bg-white p-8 border border-slate-200 shadow-xl rounded-sm">
+          <h3 className="text-2xl font-bold mb-6">Book a Test Drive</h3>
+          <form className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <input type="text" placeholder="First Name" className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-red-600 outline-none" />
+              <input type="text" placeholder="Last Name" className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-red-600 outline-none" />
+            </div>
+            <input type="email" placeholder="Email Address" className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-red-600 outline-none" />
+            <select className="w-full p-3 border border-slate-300 rounded focus:ring-2 focus:ring-red-600 outline-none">
+              <option>Interest Model</option>
+              <option>2024 RAV4 Hybrid</option>
+              <option>2024 Corolla</option>
+            </select>
+            <button className="w-full bg-[#EB0A1E] text-white py-4 font-bold uppercase tracking-widest hover:bg-black transition">
+              Confirm My Appointment
+            </button>
+            <p className="text-[10px] text-slate-400 text-center uppercase">By clicking, you agree to our privacy policy and dealer contact terms.</p>
+          </form>
+        </div>
+      </section>
+
+      {/* 7. FOOTER */}
+      <footer className="bg-slate-900 text-white py-16 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
+          <div>
+            <h4 className="font-bold mb-4 uppercase text-xs tracking-widest text-red-500">Models</h4>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li>SUVs & Crossovers</li>
+              <li>Trucks</li>
+              <li>Cars</li>
+              <li>Hybrids & EVs</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-4 uppercase text-xs tracking-widest text-red-500">Ownership</h4>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li>Service & Parts</li>
+              <li>Warranty</li>
+              <li>Manuals</li>
+              <li>ToyotaCare</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-4 uppercase text-xs tracking-widest text-red-500">Company</h4>
+            <ul className="space-y-2 text-sm text-slate-400">
+              <li>Sustainability</li>
+              <li>Careers</li>
+              <li>Newsroom</li>
+              <li>Accessibility</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-4 uppercase text-xs tracking-widest text-red-500">Connect</h4>
+            <div className="flex gap-4">
+              <Phone className="w-5 h-5" />
+              <span className="text-sm text-slate-400">1-800-GO-TOYOTA</span>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto border-t border-slate-800 pt-8 text-[10px] text-slate-500 uppercase tracking-widest text-center">
+          © 2024 Toyota Motor Sales, U.S.A., Inc. | Privacy Policy | Cookie Preferences
+        </div>
+      </footer>
+
+      {/* STICKY MOBILE CTA BAR */}
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-3 grid grid-cols-2 gap-3 z-50">
+        <button className="bg-[#EB0A1E] text-white py-3 rounded-sm font-bold text-xs uppercase tracking-tighter">
+          Build & Price
+        </button>
+        <button className="border border-slate-900 text-slate-900 py-3 rounded-sm font-bold text-xs uppercase tracking-tighter">
+          Find Dealer
+        </button>
+      </div>
+
+    </div>
+  );
+};
+
+export default ToyotaWebsite;

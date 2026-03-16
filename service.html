@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Work & Services — NEXVORA</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+/* INTERNAL PAGE STYLES */
+.page-hero{min-height:65vh;display:flex;align-items:center;padding:9rem 5rem 5rem;position:relative;overflow:hidden;}
+.page-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 30% 50%, rgba(79,163,255,.08), transparent 60%), var(--black);}
+.filter-bar{position:sticky;top:70px;z-index:50;background:rgba(3,5,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.8rem 5rem;display:flex;gap:.5rem;flex-wrap:wrap;}
+.filter-btn{font-family:'DM Mono',monospace;font-size:.65rem;padding:.45rem 1rem;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;}
+.filter-btn.active{border-color:var(--blue);color:var(--blue);background:var(--blue-dim);}
+.portfolio-grid{max-width:1300px;margin:3rem auto;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;padding:0 5rem;}
+.port-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:0.4s;}
+.pricing-section{padding:8rem 5rem;background:var(--black);}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;margin:0 auto;}
+.price-card{background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;border-radius:4px;}
+.price-card.featured{border-color:var(--blue);background:rgba(79,163,255,0.05);}
+@media(max-width:1024px){.portfolio-grid,.pricing-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){.portfolio-grid,.pricing-grid{grid-template-columns:1fr; padding:0 1.5rem;}.page-hero,.filter-bar,.pricing-section{padding:5rem 1.5rem;}}
+</style>
+</head>
+<body>
+<div id="cursor"></div><div id="cursor-ring"></div>
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>NEXVORA</a>
+  <ul class="nav-links">
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="services.html" class="active">Portfolio</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Start a Project</a></li>
+  </ul>
+</nav>
+
+<section class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <span class="label">Our Portfolio</span>
+    <h1 style="font-family:'Syne';font-size:4rem;color:white;">Work That<br>Speaks for <em>Itself</em></h1>
+  </div>
+</section>
+
+<div class="filter-bar">
+  <button class="filter-btn active">All Projects</button>
+  <button class="filter-btn">Websites</button>
+  <button class="filter-btn">Web Apps</button>
+  <button class="filter-btn">E-Commerce</button>
+</div>
+
+<section class="portfolio-grid">
+  <!-- 6 Portfolio Cards restored -->
+  <div class="port-card"><div style="height:200px;background:var(--panel-2);"></div><div style="padding:1.5rem;"><h5>Ubuhuza Platform</h5><p style="font-size:0.8rem;color:var(--text);">Legal Consultation Platform</p></div></div>
+  <div class="port-card"><div style="height:200px;background:var(--panel-2);"></div><div style="padding:1.5rem;"><h5>Fashion Store</h5><p style="font-size:0.8rem;color:var(--text);">E-Commerce Shop</p></div></div>
+  <div class="port-card"><div style="height:200px;background:var(--panel-2);"></div><div style="padding:1.5rem;"><h5>Analytics Dashboard</h5><p style="font-size:0.8rem;color:var(--text);">SaaS Solution</p></div></div>
+</section>
+
+<section class="pricing-section">
+  <div class="pricing-grid">
+    <div class="price-card"><h6>Starter</h6><div style="font-size:2rem;color:var(--blue);">$299</div><ul><li>3 Pages</li><li>SEO Ready</li></ul></div>
+    <div class="price-card featured"><h6>Professional</h6><div style="font-size:2rem;color:var(--blue);">$699</div><ul><li>6 Pages</li><li>Admin Dashboard</li><li>Telegram Alerts</li></ul></div>
+    <div class="price-card"><h6>Enterprise</h6><div style="font-size:2rem;color:var(--blue);">Custom</div><ul><li>Web Apps</li><li>E-Commerce</li></ul></div>
+  </div>
+</section>
+
+<script src="shared.js"></script>
+</body>
+</html>

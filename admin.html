@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NEXVORA Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#030508;--dark:#080d15;--panel:#0d1520;--panel-2:#111c2e;
+  --border:rgba(80,160,255,.12);--border-b:rgba(80,160,255,.3);
+  --blue:#4FA3FF;--blue-b:#78BBFF;--blue-dim:rgba(79,163,255,.15);
+  --cyan:#00E5FF;--white:#F0F6FF;--text:#8BA8C8;--text-dim:#4A6080;
+  --green:#00E5A0;--orange:#FF6B35;--red:#FF4757;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;line-height:1.6;min-height:100vh;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--dark);}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:10px;}
+
+/* ── LOGIN ── */
+#loginScreen{position:fixed;inset:0;background:var(--black);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;z-index:999;}
+#loginScreen::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(79,163,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(79,163,255,.03) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;}
+.login-box{background:var(--panel);border:1px solid var(--border-b);border-radius:8px;padding:3rem;width:380px;text-align:center;position:relative;z-index:1;animation:slideUp .4s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.login-logo{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--white);margin-bottom:.2rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.logo-dot{width:8px;height:8px;background:var(--blue);border-radius:50%;box-shadow:0 0 10px var(--blue);}
+.login-box .sub{font-size:.78rem;color:var(--text);margin-bottom:2rem;}
+.login-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:.9rem 1rem;color:var(--white);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;margin-bottom:.9rem;transition:border-color .25s;}
+.login-box input:focus{border-color:var(--blue);}
+.login-btn{width:100%;background:var(--blue);color:var(--black);border:none;padding:.9rem;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:background .25s;}
+.login-btn:hover{background:var(--blue-b);}
+.login-err{color:var(--red);font-size:.76rem;margin-top:.5rem;display:none;}
+.login-hint{font-size:.68rem;color:var(--text-dim);position:relative;z-index:1;}
+
+/* ── APP SHELL ── */
+#adminApp{display:none;}
+
+/* TOP BAR */
+.top-bar{background:rgba(8,13,21,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+.top-logo{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--white);display:flex;align-items:center;gap:.5rem;}
+.admin-badge{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);background:var(--blue-dim);border:1px solid var(--border-b);padding:.25rem .7rem;border-radius:20px;}
+.top-right{display:flex;align-items:center;gap:.8rem;}
+.top-btn{font-size:.7rem;background:none;border:1px solid rgba(255,255,255,.12);color:var(--text);padding:.4rem 1rem;border-radius:4px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;}
+.top-btn:hover{border-color:var(--blue);color:var(--blue);}
+.top-btn-red:hover{border-color:var(--red)!important;color:var(--red)!important;}
+
+/* TAB BAR */
+.tab-bar{background:rgba(8,13,21,.7);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text);padding:.95rem 1.3rem;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.tab:hover{color:var(--white);}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;background:var(--red);color:#fff;border-radius:50%;font-size:.58rem;font-weight:700;margin-left:.4rem;}
+
+/* MAIN */
+.admin-main{max-width:1400px;margin:0 auto;padding:2rem;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2rem;}
+.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:1.3rem 1.2rem;transition:border-color .25s;}
+.stat-card:hover{border-color:var(--border-b);}
+.sc-lbl{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.5rem;font-family:'DM Mono',monospace;}
+.sc-val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--blue);line-height:1;}
+.sc-sub{font-size:.66rem;color:var(--text-dim);margin-top:.3rem;}
+.sc-red .sc-val{color:var(--red);}
+.sc-orange .sc-val{color:var(--orange);}
+.sc-green .sc-val{color:var(--green);}
+
+/* CONTROLS */
+.controls{display:flex;gap:.8rem;margin-bottom:1.2rem;flex-wrap:wrap;align-items:center;background:rgba(8,13,21,.4);border:1px solid var(--border);border-radius:6px;padding:1rem;}
+.search-box{flex:1;min-width:200px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:.6rem 1rem;color:var(--white);font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;transition:border-color .25s;}
+.search-box:focus{border-color:var(--blue);}
+.filter-sel{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:.6rem 1rem;color:var(--white);font-family:'DM Sans',sans-serif;font-size:.78rem;outline:none;cursor:pointer;}
+.filter-sel option{background:var(--panel);}
+.ctrl-btn{background:none;border:1px solid var(--border-b);color:var(--blue);padding:.6rem 1.1rem;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.74rem;font-weight:500;transition:all .2s;white-space:nowrap;}
+.ctrl-btn:hover{background:var(--blue-dim);}
+.ctrl-red{border-color:rgba(255,71,87,.3);color:var(--red);}
+.ctrl-red:hover{background:rgba(255,71,87,.08);}
+.ctrl-green{border-color:rgba(0,229,160,.3);color:var(--green);}
+.ctrl-green:hover{background:rgba(0,229,160,.06);}
+
+/* TABLE */
+.table-wrap{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.table-head-row{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:rgba(8,13,21,.4);}
+.table-head-row h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--white);}
+.count-pill{font-size:.65rem;font-weight:700;background:var(--blue-dim);border:1px solid var(--border-b);color:var(--blue);padding:.2rem .7rem;border-radius:20px;font-family:'DM Mono',monospace;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:rgba(8,13,21,.5);}
+th{padding:.8rem 1rem;text-align:left;font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);border-bottom:1px solid var(--border);white-space:nowrap;font-family:'DM Mono',monospace;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;cursor:pointer;}
+tbody tr.unread{background:rgba(79,163,255,.04);}
+tbody tr:hover{background:rgba(79,163,255,.07)!important;}
+tbody tr:last-child{border-bottom:none;}
+td{padding:.85rem 1rem;font-size:.8rem;color:var(--white);vertical-align:middle;}
+.td-mono{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--text-dim);}
+.td-name{font-weight:600;}
+.td-contact{font-size:.72rem;color:var(--text);line-height:1.6;}
+.td-time{font-size:.68rem;color:var(--text-dim);white-space:nowrap;}
+.unread-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;display:inline-block;margin-right:.5rem;box-shadow:0 0 6px var(--blue);}
+.badge{display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .55rem;border-radius:20px;}
+.b-contact{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(79,163,255,.25);}
+.b-service{background:rgba(0,229,160,.08);color:var(--green);border:1px solid rgba(0,229,160,.2);}
+.b-new{background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.2);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:5rem 2rem;}
+.empty-icon{font-size:3.5rem;margin-bottom:1rem;opacity:.3;}
+.empty-state h4{font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--white);margin-bottom:.5rem;}
+.empty-state p{font-size:.82rem;color:var(--text);line-height:1.7;max-width:400px;margin:0 auto;}
+
+/* DETAIL OVERLAY */
+.detail-overlay{display:none;position:fixed;inset:0;background:rgba(3,5,8,.88);z-index:300;backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:2rem;}
+.detail-overlay.active{display:flex;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.detail-panel{background:var(--panel-2);border:1px solid var(--border-b);border-radius:8px;max-width:580px;width:100%;max-height:92vh;overflow-y:auto;animation:slideUp .3s ease;}
+.dp-header{padding:1.8rem 2rem 1.2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;background:rgba(8,13,21,.3);}
+.dp-type{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:.3rem;}
+.dp-header h3{font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--white);}
+.dp-close{background:none;border:1px solid rgba(255,255,255,.12);color:var(--text);width:34px;height:34px;border-radius:4px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.dp-close:hover{border-color:var(--blue);color:var(--blue);}
+.dp-body{padding:1.5rem 2rem 2rem;}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem 1.8rem;margin-bottom:1.2rem;}
+.dp-row{}
+.dp-lbl{font-family:'DM Mono',monospace;font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:.25rem;}
+.dp-val{font-size:.86rem;color:var(--white);line-height:1.5;word-break:break-word;}
+.dp-msg-wrap{margin-top:1rem;}
+.dp-msg{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:1rem;font-size:.81rem;color:var(--text);line-height:1.8;white-space:pre-wrap;word-break:break-word;margin-top:.5rem;max-height:200px;overflow-y:auto;}
+.dp-actions{display:flex;gap:.7rem;margin-top:1.5rem;flex-wrap:wrap;}
+.dab{flex:1;min-width:90px;padding:.72rem .5rem;font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:all .2s;text-decoration:none;display:block;text-align:center;border:none;}
+.dab-wa{background:rgba(37,211,102,.1);color:#25d366;border:1px solid rgba(37,211,102,.25);}
+.dab-wa:hover{background:rgba(37,211,102,.2);}
+.dab-email{background:var(--blue-dim);color:var(--blue);border:1px solid var(--border-b);}
+.dab-email:hover{background:rgba(79,163,255,.25);}
+.dab-tel{background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.2);}
+.dab-tel:hover{background:rgba(0,229,255,.15);}
+.dab-del{background:rgba(255,71,87,.08);color:var(--red);border:1px solid rgba(255,71,87,.22);}
+.dab-del:hover{background:rgba(255,71,87,.16);}
+
+/* SETUP PANEL */
+.setup-wrap{max-width:860px;margin:0 auto;}
+.setup-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:2rem;margin-bottom:1.5rem;}
+.setup-card h3{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;color:var(--white);margin-bottom:.4rem;}
+.setup-card p{font-size:.82rem;color:var(--text);line-height:1.8;margin-bottom:1.2rem;}
+.setup-status{display:inline-flex;align-items:center;gap:.5rem;font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.28rem .7rem;border-radius:20px;margin-bottom:1rem;font-family:'DM Mono',monospace;}
+.s-ok{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25);}
+.s-warn{background:rgba(255,107,53,.1);color:var(--orange);border:1px solid rgba(255,107,53,.25);}
+.sf{margin-bottom:1rem;}
+.sf label{display:block;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:.4rem;}
+.sf input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:.8rem 1rem;color:var(--white);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .25s;}
+.sf input:focus{border-color:var(--blue);}
+.sbtn{background:var(--blue);color:var(--black);border:none;padding:.8rem 1.8rem;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:background .25s;margin-right:.8rem;margin-top:.4rem;}
+.sbtn:hover{background:var(--blue-b);}
+.sbtn-out{background:none;color:var(--text);border:1px solid rgba(255,255,255,.15);padding:.8rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:all .25s;margin-top:.4rem;}
+.sbtn-out:hover{border-color:var(--blue);color:var(--blue);}
+.test-result{display:none;margin-top:.8rem;padding:.7rem 1rem;border-radius:4px;font-size:.78rem;font-weight:500;}
+.t-ok{background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);color:var(--green);}
+.t-fail{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);color:var(--red);}
+code{font-family:'DM Mono',monospace;background:var(--blue-dim);border:1px solid var(--border-b);border-radius:2px;padding:.12rem .4rem;font-size:.8em;color:var(--blue-b);}
+.steps-list{list-style:none;counter-reset:s;margin-bottom:1.5rem;}
+.steps-list li{counter-increment:s;display:flex;gap:1rem;margin-bottom:.9rem;align-items:flex-start;font-size:.82rem;color:var(--text);line-height:1.6;}
+.steps-list li::before{content:counter(s);min-width:24px;height:24px;background:var(--blue-dim);border:1px solid var(--border-b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:700;color:var(--blue);flex-shrink:0;font-family:'DM Mono',monospace;}
+.steps-list li strong{color:var(--white);}
+.storage-info{font-size:.8rem;color:var(--text);line-height:1.8;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:4px;padding:1rem;margin-top:1rem;}
+
+/* ALERT BANNER */
+.alert-box{border-radius:6px;padding:1rem 1.4rem;font-size:.82rem;margin-bottom:1.5rem;}
+.alert-new{background:rgba(79,163,255,.06);border:1px solid rgba(79,163,255,.2);color:var(--blue);}
+
+@media(max-width:768px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .admin-main{padding:1rem;}
+  th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6){display:none;}
+  .dp-grid{grid-template-columns:1fr;}
+  .controls{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><span class="logo-dot"></span>NEXVORA</div>
+    <p class="sub">Admin Dashboard · Leads Portal</p>
+    <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-err" id="loginErr">Incorrect password. Try again.</div>
+  </div>
+  <div class="login-hint">Default password on first login: set your own below</div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+
+  <div class="top-bar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="top-logo"><span class="logo-dot"></span>NEXVORA</div>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="top-right">
+      <a href="index.html" class="top-btn">← Website</a>
+      <button class="top-btn" onclick="showTab('setup')">⚙ Setup</button>
+      <button class="top-btn top-btn-red" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" id="tab-all" onclick="showTab('all')">All Leads <span class="tab-badge" id="badge-all" style="display:none"></span></button>
+    <button class="tab" id="tab-contact" onclick="showTab('contact')">Contact Forms</button>
+    <button class="tab" id="tab-service" onclick="showTab('service')">Service Requests</button>
+    <button class="tab" id="tab-setup" onclick="showTab('setup')">⚙ Setup</button>
+  </div>
+
+  <main class="admin-main">
+
+    <!-- ALL LEADS -->
+    <div class="panel active" id="panel-all">
+      <div class="stats-row">
+        <div class="stat-card"><div class="sc-lbl">Total Leads</div><div class="sc-val" id="s-total">0</div><div class="sc-sub">All time</div></div>
+        <div class="stat-card sc-green"><div class="sc-lbl">Unread</div><div class="sc-val" id="s-unread">0</div><div class="sc-sub">Not yet opened</div></div>
+        <div class="stat-card sc-orange"><div class="sc-lbl">Contact Forms</div><div class="sc-val" id="s-contact">0</div><div class="sc-sub">Website enquiries</div></div>
+        <div class="stat-card"><div class="sc-lbl">Service Requests</div><div class="sc-val" id="s-service">0</div><div class="sc-sub">Via services page</div></div>
+        <div class="stat-card"><div class="sc-lbl">Top Service</div><div class="sc-val" id="s-top" style="font-size:.95rem;padding-top:.4rem;line-height:1.3;">—</div><div class="sc-sub">Most requested</div></div>
+      </div>
+      <div class="controls">
+        <input class="search-box" id="searchInput" type="text" placeholder="🔍  Search name, email, service, message…" oninput="renderTable()">
+        <select class="filter-sel" id="filterType" onchange="renderTable()">
+          <option value="">All Types</option>
+          <option value="Contact Form">Contact Forms</option>
+          <option value="Service Request">Service Requests</option>
+        </select>
+        <button class="ctrl-btn ctrl-green" onclick="renderDashboard()">⟳ Refresh</button>
+        <button class="ctrl-btn" onclick="exportCSV()">↓ CSV Export</button>
+        <button class="ctrl-btn ctrl-red" onclick="clearAllConfirm()">🗑 Clear All</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-head-row"><h3>Client Leads</h3><span class="count-pill" id="tableCount">0 records</span></div>
+        <div id="tableContent"></div>
+      </div>
+    </div>
+
+    <!-- CONTACT FORMS -->
+    <div class="panel" id="panel-contact">
+      <div class="table-wrap">
+        <div class="table-head-row"><h3>💬 Contact Form Submissions</h3><span class="count-pill" id="contactCount">0</span></div>
+        <div id="contactContent"></div>
+      </div>
+    </div>
+
+    <!-- SERVICE REQUESTS -->
+    <div class="panel" id="panel-service">
+      <div class="table-wrap">
+        <div class="table-head-row"><h3>⚡ Service Requests</h3><span class="count-pill" id="serviceCount">0</span></div>
+        <div id="serviceContent"></div>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="panel" id="panel-setup">
+      <div class="setup-wrap">
+
+        <div class="setup-card">
+          <h3>📱 Telegram Notifications</h3>
+          <div id="tg-status"></div>
+          <p>Get an instant Telegram message every time someone submits a form — with a one-click WhatsApp reply button. The fastest way to follow up on leads.</p>
+          <ul class="steps-list">
+            <li>Open Telegram, search <code>@BotFather</code>, send <code>/newbot</code>. Copy the <strong>Bot Token</strong> it gives you.</li>
+            <li>Search <code>@userinfobot</code> on Telegram, send any message. Copy your <strong>Chat ID</strong> number.</li>
+            <li>Paste both below and click <strong>Send Test</strong>. If it works, you're all set!</li>
+          </ul>
+          <div class="sf"><label>Bot Token</label><input type="text" id="tg-token" placeholder="7123456789:AAHdqTcvCH..." oninput="saveTg()"></div>
+          <div class="sf"><label>Chat ID</label><input type="text" id="tg-chatid" placeholder="123456789" oninput="saveTg()"></div>
+          <button class="sbtn" onclick="testTelegram()">📱 Send Test Message</button>
+          <button class="sbtn-out" onclick="clearTg()">Clear</button>
+          <div class="test-result" id="tg-result"></div>
+        </div>
+
+        <div class="setup-card">
+          <h3>🔒 Admin Password</h3>
+          <p>Set or change your admin password. Minimum 8 characters. Stored only in your browser — never in any file.</p>
+          <div class="sf"><label>New Password</label><input type="password" id="new-pass" placeholder="New password (min 8 chars)"></div>
+          <div class="sf"><label>Confirm Password</label><input type="password" id="confirm-pass" placeholder="Repeat password"></div>
+          <button class="sbtn" onclick="savePassword()">🔒 Save Password</button>
+          <div class="test-result" id="pass-result"></div>
+        </div>
+
+        <div class="setup-card">
+          <h3>💾 Storage Info</h3>
+          <p>All leads are saved in your browser's localStorage — they persist across restarts on this device. Use CSV Export to back them up or move them.</p>
+          <div class="storage-info" id="storage-info">Loading…</div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- DETAIL OVERLAY -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel">
+    <div class="dp-header">
+      <div><div class="dp-type" id="d-type"></div><h3 id="d-title"></h3></div>
+      <button class="dp-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="dp-body">
+      <div class="dp-grid">
+        <div class="dp-row"><div class="dp-lbl">Name</div><div class="dp-val" id="d-name"></div></div>
+        <div class="dp-row"><div class="dp-lbl">Email</div><div class="dp-val" id="d-email"></div></div>
+        <div class="dp-row"><div class="dp-lbl">Phone</div><div class="dp-val" id="d-phone"></div></div>
+        <div class="dp-row"><div class="dp-lbl">Service Needed</div><div class="dp-val" id="d-service"></div></div>
+        <div class="dp-row"><div class="dp-lbl">Budget</div><div class="dp-val" id="d-budget"></div></div>
+        <div class="dp-row"><div class="dp-lbl">Submitted</div><div class="dp-val" id="d-time"></div></div>
+      </div>
+      <div class="dp-msg-wrap">
+        <div class="dp-lbl">Message / Details</div>
+        <div class="dp-msg" id="d-msg"></div>
+      </div>
+      <div class="dp-actions">
+        <a class="dab dab-wa" id="d-wa" href="#" target="_blank">📱 WhatsApp</a>
+        <a class="dab dab-email" id="d-email-link" href="#">✉ Email</a>
+        <a class="dab dab-tel" id="d-tel" href="#">📞 Call</a>
+        <button class="dab dab-del" id="d-del">🗑 Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CREDENTIALS ──
+const Creds = {
+  PW_KEY:'nxv_pw', TG_KEY:'nxv_tg', CHAT_KEY:'nxv_chat',
+  getPass(){ return localStorage.getItem(this.PW_KEY); },
+  setPass(p){ localStorage.setItem(this.PW_KEY,p); },
+  getTg(){ return localStorage.getItem(this.TG_KEY)||''; },
+  getChat(){ return localStorage.getItem(this.CHAT_KEY)||''; },
+};
+
+// ── DB (mirrors NexvoraDB from shared.js) ──
+const DB = {
+  KEY:'nexvora_leads_v1',
+  getAll(){ try{ return JSON.parse(localStorage.getItem(this.KEY)||'[]'); }catch{ return []; } },
+  markRead(id){ localStorage.setItem(this.KEY,JSON.stringify(this.getAll().map(r=>r.id===id?{...r,read:true}:r))); },
+  delete(id){ localStorage.setItem(this.KEY,JSON.stringify(this.getAll().filter(r=>r.id!==id))); },
+  clearAll(){ localStorage.removeItem(this.KEY); }
+};
+
+// ── LOGIN ──
+function doLogin(){
+  const entered = document.getElementById('pwInput').value;
+  const stored  = Creds.getPass();
+  if(!stored){ // first time — set password
+    if(!entered||entered.length<4){ showErr('Set a password (min 4 chars).'); return; }
+    Creds.setPass(entered);
+    launch();
+  } else {
+    if(entered===stored){ launch(); }
+    else { showErr('Incorrect password. Try again.'); document.getElementById('pwInput').value=''; }
+  }
+}
+function showErr(msg){ const e=document.getElementById('loginErr'); e.textContent=msg; e.style.display='block'; }
+function launch(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('adminApp').style.display='block';
+  document.getElementById('loginErr').style.display='none';
+  loadTgConfig(); renderDashboard();
+}
+function doLogout(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('adminApp').style.display='none';
+  document.getElementById('pwInput').value='';
+}
+document.getElementById('pwInput').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+
+// ── TABS ──
+function showTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+n)?.classList.add('active');
+  document.getElementById('panel-'+n)?.classList.add('active');
+  if(n==='setup') loadSetupInfo();
+}
+
+// ── BADGES ──
+function setBadge(id,n){ const el=document.getElementById(id); if(!el)return; el.style.display=n>0?'inline-flex':'none'; el.textContent=n>99?'99+':n; }
+
+// ── BADGE HELPERS ──
+function typeBadge(t){ return t==='Service Request'?'<span class="badge b-service">Service</span>':'<span class="badge b-contact">Contact</span>'; }
+
+// ── BUILD TABLE HTML ──
+function buildTable(data){
+  if(!data.length) return `<div class="empty-state"><div class="empty-icon">📭</div><h4>No Leads Yet</h4><p>When visitors fill in a contact form or request a service on your website, their details will appear here.</p></div>`;
+  return `<table><thead><tr><th>#</th><th>Client</th><th>Type</th><th>Service / Project</th><th>Contact</th><th>Received</th></tr></thead><tbody>
+    ${data.map((d,i)=>`
+    <tr class="${d.read?'':'unread'}" onclick="openDetail('${d.id}')">
+      <td class="td-mono">${!d.read?'<span class="unread-dot"></span>':''}${i+1}</td>
+      <td><div class="td-name">${esc(d.name||'—')}</div></td>
+      <td>${typeBadge(d.type)}</td>
+      <td style="font-size:.76rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc((d.service||'—').slice(0,40))}</td>
+      <td class="td-contact">${esc(d.email||'—')}<br>${esc(d.phone||'—')}</td>
+      <td class="td-time">${d.timestamp||'—'}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+// ── RENDER DASHBOARD ──
+function renderDashboard(){
+  const all = DB.getAll();
+  document.getElementById('s-total').textContent   = all.length;
+  document.getElementById('s-unread').textContent  = all.filter(d=>!d.read).length;
+  document.getElementById('s-contact').textContent = all.filter(d=>d.type==='Contact Form').length;
+  document.getElementById('s-service').textContent = all.filter(d=>d.type==='Service Request').length;
+  const counts={}; all.forEach(d=>{ if(d.service){ counts[d.service]=(counts[d.service]||0)+1; } });
+  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('s-top').textContent = top ? top[0].split('–')[0].trim().slice(0,20) : '—';
+  setBadge('badge-all', all.filter(d=>!d.read).length);
+  renderTable();
+  const contacts = all.filter(d=>d.type==='Contact Form');
+  const services = all.filter(d=>d.type==='Service Request');
+  document.getElementById('contactCount').textContent = contacts.length+' record'+(contacts.length!==1?'s':'');
+  document.getElementById('serviceCount').textContent = services.length+' record'+(services.length!==1?'s':'');
+  document.getElementById('contactContent').innerHTML = buildTable(contacts);
+  document.getElementById('serviceContent').innerHTML = buildTable(services);
+}
+
+function renderTable(){
+  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const tf = document.getElementById('filterType')?.value||'';
+  let data = DB.getAll().filter(d=>{
+    const txt = `${d.name} ${d.email} ${d.phone} ${d.service} ${d.message}`.toLowerCase();
+    return (!q||txt.includes(q))&&(!tf||d.type===tf);
+  });
+  document.getElementById('tableCount').textContent = `${data.length} record${data.length!==1?'s':''}`;
+  document.getElementById('tableContent').innerHTML = buildTable(data);
+}
+
+// ── OPEN DETAIL ──
+function openDetail(id){
+  const d = DB.getAll().find(r=>r.id===id); if(!d) return;
+  DB.markRead(id);
+  document.getElementById('d-type').textContent    = d.type||'Submission';
+  document.getElementById('d-title').textContent   = d.service||'General Enquiry';
+  document.getElementById('d-name').textContent    = d.name||'—';
+  document.getElementById('d-email').textContent   = d.email||'—';
+  document.getElementById('d-phone').textContent   = d.phone||'Not provided';
+  document.getElementById('d-service').textContent = d.service||'Not specified';
+  document.getElementById('d-budget').textContent  = d.budget||'Not specified';
+  document.getElementById('d-time').textContent    = d.timestamp||'—';
+  document.getElementById('d-msg').textContent     = d.message||'—';
+  const p = (d.phone||'').replace(/\D/g,'');
+  const wt = encodeURIComponent(`Hello ${(d.name||'').split(' ')[0]}, this is NEXVORA Studio. We received your enquiry about "${d.service||'web development'}" and would love to help. When is a good time to chat?`);
+  document.getElementById('d-wa').href = p?`https://wa.me/${p}?text=${wt}`:'#';
+  document.getElementById('d-tel').href = d.phone?`tel:${d.phone}`:'#';
+  const sub = encodeURIComponent(`Re: ${d.service||'Your Enquiry'} — NEXVORA Studio`);
+  const body = encodeURIComponent(`Hello ${(d.name||'').split(' ')[0]},\n\nThank you for reaching out to NEXVORA Studio!\n\nWe've reviewed your enquiry and would love to help you with ${d.service||'your project'}.\n\nCould we schedule a quick call to discuss further?\n\nBest regards,\nNEXVORA Studio Team\nhello@nexvora.dev | +250 788 649 151`);
+  document.getElementById('d-email-link').href = d.email?`mailto:${d.email}?subject=${sub}&body=${body}`:'#';
+  document.getElementById('d-del').onclick = ()=>{
+    if(confirm('Delete this lead permanently?')){ DB.delete(id); closeDetail(); renderDashboard(); }
+  };
+  document.getElementById('detailOverlay').classList.add('active');
+  document.body.style.overflow='hidden';
+  renderDashboard();
+}
+function closeDetail(){
+  document.getElementById('detailOverlay').classList.remove('active');
+  document.body.style.overflow='';
+}
+document.getElementById('detailOverlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('detailOverlay')) closeDetail();
+});
+
+// ── EXPORT CSV ──
+function exportCSV(){
+  const data=DB.getAll();
+  if(!data.length){ alert('No leads to export.'); return; }
+  const h=['ID','Type','Name','Email','Phone','Service','Budget','Message','Received'];
+  const rows=data.map(d=>[d.id,d.type,d.name||'',d.email||'',d.phone||'',d.service||'',d.budget||'','"'+(d.message||'').replace(/"/g,'""')+'"',d.timestamp||''].join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`nexvora-leads-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ── CLEAR ALL ──
+function clearAllConfirm(){
+  const n=DB.getAll().length;
+  if(!n){ alert('No leads to clear.'); return; }
+  if(confirm(`Delete ALL ${n} leads? This cannot be undone.`)){ DB.clearAll(); renderDashboard(); }
+}
+
+// ── TELEGRAM ──
+function saveTg(){
+  const t=document.getElementById('tg-token').value.trim();
+  const c=document.getElementById('tg-chatid').value.trim();
+  if(t) localStorage.setItem(Creds.TG_KEY,t);
+  if(c) localStorage.setItem(Creds.CHAT_KEY,c);
+}
+function clearTg(){
+  localStorage.removeItem(Creds.TG_KEY); localStorage.removeItem(Creds.CHAT_KEY);
+  document.getElementById('tg-token').value=''; document.getElementById('tg-chatid').value='';
+}
+function loadTgConfig(){
+  const t=Creds.getTg(), c=Creds.getChat();
+  if(t) document.getElementById('tg-token').value=t;
+  if(c) document.getElementById('tg-chatid').value=c;
+}
+async function testTelegram(){
+  saveTg();
+  const token=Creds.getTg(), chatId=Creds.getChat();
+  const el=document.getElementById('tg-result');
+  el.style.display='block'; el.className='test-result'; el.textContent='⏳ Sending…';
+  if(!token){ el.className='test-result t-fail'; el.textContent='❌ Enter your Bot Token first.'; return; }
+  if(!chatId){ el.className='test-result t-fail'; el.textContent='❌ Enter your Chat ID first.'; return; }
+  try{
+    const msg=`✅ *NEXVORA Studio — Connected!*\n\nYour Telegram notifications are working. New leads will appear here instantly.\n\n🕐 ${new Date().toLocaleString('en-RW',{timeZone:'Africa/Kigali'})}`;
+    const res=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chatId,text:msg,parse_mode:'Markdown'})});
+    const data=await res.json();
+    if(data.ok){ el.className='test-result t-ok'; el.textContent='✅ Sent! Check your Telegram.'; }
+    else{ el.className='test-result t-fail'; el.textContent=`❌ Telegram error: ${data.description}`; }
+  }catch(e){ el.className='test-result t-fail'; el.textContent=`❌ Network error: ${e.message}`; }
+}
+
+// ── PASSWORD ──
+function savePassword(){
+  const np=document.getElementById('new-pass').value;
+  const cp=document.getElementById('confirm-pass').value;
+  const el=document.getElementById('pass-result');
+  el.style.display='block';
+  if(!np||np.length<8){ el.className='test-result t-fail'; el.textContent='❌ Password must be at least 8 characters.'; return; }
+  if(np!==cp){ el.className='test-result t-fail'; el.textContent='❌ Passwords do not match.'; return; }
+  Creds.setPass(np);
+  document.getElementById('new-pass').value=''; document.getElementById('confirm-pass').value='';
+  el.className='test-result t-ok'; el.textContent='✅ Password updated!';
+  setTimeout(()=>el.style.display='none',3500);
+}
+
+// ── SETUP INFO ──
+function loadSetupInfo(){
+  const tgOk=!!Creds.getTg()&&!!Creds.getChat();
+  document.getElementById('tg-status').innerHTML=tgOk?'<div class="setup-status s-ok">✅ Telegram Connected</div>':'<div class="setup-status s-warn">⚠ Not configured yet</div>';
+  const all=DB.getAll();
+  const kb=(JSON.stringify(all).length/1024).toFixed(1);
+  document.getElementById('storage-info').innerHTML=`<strong>${all.length} leads</strong> stored on this device &nbsp;·&nbsp; ${kb} KB used &nbsp;·&nbsp; Password: ${Creds.getPass()?'<span style="color:var(--green)">✅ Set</span>':'<span style="color:var(--orange)">⚠ Not set</span>'}`;
+}
+
+// ── UTILS ──
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// Auto-refresh every 20s when logged in
+setInterval(()=>{ if(document.getElementById('adminApp').style.display==='block') renderDashboard(); },20000);
+</script>
+</body>
+</html>

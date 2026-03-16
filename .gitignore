@@ -1,0 +1,32 @@
+# OS / Editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env / secrets
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Node / tooling (in case you add later)
+node_modules/
+dist/
+build/
+.parcel-cache/
+.cache/
+
+# Netlify local folder (optional, if you use netlify-cli)
+.netlify/
+
