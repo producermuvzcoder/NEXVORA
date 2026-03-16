@@ -47,11 +47,38 @@ window.NexvoraDB = {
     const all = this.getAll();
     record.id = 'NX-' + Date.now();
     record.timestamp = new Date().toLocaleString();
+    record.read = false;
     all.unshift(record);
     localStorage.setItem(this.KEY, JSON.stringify(all));
   },
   getAll() { try { return JSON.parse(localStorage.getItem(this.KEY)||'[]'); } catch { return []; } }
 };
+
+async function maybeSendTelegramLead(record){
+  const token = (localStorage.getItem('nxv_tg')||'').trim();
+  const chatId = (localStorage.getItem('nxv_chat')||'').trim();
+  if(!token || !chatId) return;
+  try{
+    const lines = [
+      '📩 New NEXVORA Lead',
+      '',
+      `Type: ${record.type || 'Contact Form'}`,
+      `Name: ${record.name || '—'}`,
+      `Email: ${record.email || '—'}`,
+      `Service: ${record.service || '—'}`,
+      '',
+      (record.message || '').trim() ? `Message: ${record.message}` : ''
+    ].filter(Boolean);
+    const text = lines.join('\n');
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:chatId,text})
+    });
+  }catch{
+    // ignore telegram failures (site should still submit)
+  }
+}
 
 // 5. NETLIFY FORM HANDLING
 const cForm = document.getElementById('contactForm');
@@ -64,13 +91,21 @@ if(cForm){
     btn.innerHTML = '<span class="loader"></span> Sending...';
     btn.disabled = true;
 
-    // Save Local
-    NexvoraDB.save({
+    const record = {
+      type: 'Contact Form',
       name: formData.get('name'),
       email: formData.get('email'),
+      phone: formData.get('phone') || '',
       service: formData.get('service'),
+      budget: formData.get('budget') || '',
       message: formData.get('message')
-    });
+    };
+
+    // Save Local (for admin.html dashboard on THIS device/browser)
+    NexvoraDB.save(record);
+
+    // Optional Telegram notification (configured in admin.html Setup)
+    maybeSendTelegramLead(record);
 
     // Send Netlify
     fetch("/", {

@@ -30,3 +30,8 @@ build/
 # Netlify local folder (optional, if you use netlify-cli)
 .netlify/
 
+# Microsoft Office temporary/lock files
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
