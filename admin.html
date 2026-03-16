@@ -463,7 +463,7 @@ function openDetail(id){
   document.getElementById('d-wa').href = p?`https://wa.me/${p}?text=${wt}`:'#';
   document.getElementById('d-tel').href = d.phone?`tel:${d.phone}`:'#';
   const sub = encodeURIComponent(`Re: ${d.service||'Your Enquiry'} — NEXVORA Studio`);
-  const body = encodeURIComponent(`Hello ${(d.name||'').split(' ')[0]},\n\nThank you for reaching out to NEXVORA Studio!\n\nWe've reviewed your enquiry and would love to help you with ${d.service||'your project'}.\n\nCould we schedule a quick call to discuss further?\n\nBest regards,\nNEXVORA Studio Team\nhello@nexvora.dev | +250 788 649 151`);
+  const body = encodeURIComponent(`Hello ${(d.name||'').split(' ')[0]},\n\nThank you for reaching out to NEXVORA Studio!\n\nWe've reviewed your enquiry and would love to help you with ${d.service||'your project'}.\n\nCould we schedule a quick call to discuss further?\n\nBest regards,\nNEXVORA Studio Team\nnexvora@gmail.com | +250 780 260 452`);
   document.getElementById('d-email-link').href = d.email?`mailto:${d.email}?subject=${sub}&body=${body}`:'#';
   document.getElementById('d-del').onclick = ()=>{
     if(confirm('Delete this lead permanently?')){ DB.delete(id); closeDetail(); renderDashboard(); }
