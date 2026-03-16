@@ -45,11 +45,12 @@ window.NexvoraDB = {
   KEY: 'nexvora_leads_v1',
   save(record) {
     const all = this.getAll();
-    record.id = 'NX-' + Date.now();
-    record.timestamp = new Date().toLocaleString();
-    record.read = false;
+    record.id = record.id || ('NX-' + Date.now());
+    record.timestamp = record.timestamp || new Date().toLocaleString();
+    record.read = (typeof record.read === 'boolean') ? record.read : false;
     all.unshift(record);
     localStorage.setItem(this.KEY, JSON.stringify(all));
+    return true;
   },
   getAll() { try { return JSON.parse(localStorage.getItem(this.KEY)||'[]'); } catch { return []; } }
 };
@@ -102,7 +103,8 @@ if(cForm){
     };
 
     // Save Local (for admin.html dashboard on THIS device/browser)
-    NexvoraDB.save(record);
+    let savedOk = false;
+    try{ savedOk = NexvoraDB.save(record); }catch{ savedOk = false; }
 
     // Optional Telegram notification (configured in admin.html Setup)
     maybeSendTelegramLead(record);
@@ -118,7 +120,7 @@ if(cForm){
       document.getElementById('contactSuccess').style.display='block';
     })
     .catch(() => {
-      btn.innerHTML='Error. Try again.';
+      btn.innerHTML = savedOk ? 'Sent locally. Network error.' : 'Error. Try again.';
       btn.disabled=false;
     });
   });

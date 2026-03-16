@@ -295,6 +295,10 @@ code{font-family:'DM Mono',monospace;background:var(--blue-dim);border:1px solid
           <h3>💾 Storage Info</h3>
           <p>All leads are saved in your browser's localStorage — they persist across restarts on this device. Use CSV Export to back them up or move them.</p>
           <div class="storage-info" id="storage-info">Loading…</div>
+          <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem;">
+            <button class="sbtn" onclick="addTestLead()">➕ Add Test Lead</button>
+            <button class="sbtn-out" onclick="showStorageDebug()">🔎 Debug Storage</button>
+          </div>
         </div>
 
       </div>
@@ -548,7 +552,55 @@ function loadSetupInfo(){
   document.getElementById('tg-status').innerHTML=tgOk?'<div class="setup-status s-ok">✅ Telegram Connected</div>':'<div class="setup-status s-warn">⚠ Not configured yet</div>';
   const all=DB.getAll();
   const kb=(JSON.stringify(all).length/1024).toFixed(1);
-  document.getElementById('storage-info').innerHTML=`<strong>${all.length} leads</strong> stored on this device &nbsp;·&nbsp; ${kb} KB used &nbsp;·&nbsp; Password: ${Creds.getPass()?'<span style="color:var(--green)">✅ Set</span>':'<span style="color:var(--orange)">⚠ Not set</span>'}`;
+  const origin = location.origin;
+  document.getElementById('storage-info').innerHTML=
+    `<strong>${all.length} leads</strong> stored on this device/browser`+
+    ` &nbsp;·&nbsp; ${kb} KB used`+
+    ` &nbsp;·&nbsp; Origin: <code>${origin}</code>`+
+    ` &nbsp;·&nbsp; Password: ${Creds.getPass()?'<span style="color:var(--green)">✅ Set</span>':'<span style="color:var(--orange)">⚠ Not set</span>'}`;
+}
+
+function addTestLead(){
+  const now = new Date();
+  const record = {
+    id: 'NX-TEST-' + Date.now(),
+    type: 'Contact Form',
+    name: 'Test Lead',
+    email: 'test@example.com',
+    phone: '+250700000000',
+    service: 'Business Website',
+    budget: '—',
+    message: 'If you can see this, your admin dashboard and localStorage are working.',
+    timestamp: now.toLocaleString(),
+    read: false,
+  };
+  try{
+    const all = DB.getAll();
+    all.unshift(record);
+    localStorage.setItem(DB.KEY, JSON.stringify(all));
+    renderDashboard();
+    loadSetupInfo();
+    alert('✅ Test lead added. Go to All Leads and refresh.');
+  }catch(e){
+    alert('❌ Could not write to localStorage: ' + e.message);
+  }
+}
+
+function showStorageDebug(){
+  try{
+    const raw = localStorage.getItem(DB.KEY);
+    const all = DB.getAll();
+    const sample = all[0] || null;
+    alert(
+      `Origin: ${location.origin}\n`+
+      `Storage key: ${DB.KEY}\n`+
+      `Raw exists: ${raw ? 'YES' : 'NO'}\n`+
+      `Count: ${all.length}\n`+
+      `First record keys: ${sample ? Object.keys(sample).join(', ') : '—'}`
+    );
+  }catch(e){
+    alert('❌ Storage debug failed: ' + e.message);
+  }
 }
 
 // ── UTILS ──
